@@ -3,43 +3,50 @@ package com.cts.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.cts.entity.Account;
-import com.cts.entity.AccountList;
+import com.cts.entity.AccountService;
 import com.cts.entity.Transaction;
-import com.cts.entity.TransactionList;
+import com.cts.entity.TransactionService;
 
+@Component
 public class HomepageServiceImpl implements HomepageService {
 
 	@Autowired
 	private RestTemplate rest;
+	
+	@Autowired
+	private AccountService accountService;
 
+	@Autowired
+	private TransactionService transactionService;
+	
 	@Override
-	public List<Account> getAccounts(long custId) {
+	public List<Account> getAccounts(long userId) {
 
-		AccountList response =  rest.getForObject("http://ACCOUNT/getAccounts"+custId, AccountList.class);
-		List<Account> accounts = response.getAccounts();
+		List<Account> accounts = accountService.getLatestAccounts(userId);
 		return accounts;
 	}
 
 	@Override
-	public List<Transaction> getTransactions(long custId) {
-		TransactionList response =  rest.getForObject("http://TRANSACTIONS/getTransactions"+custId, TransactionList.class);
-		List<Transaction> transactions = response.getTransactions();
+	public List<Transaction> getTransactions(long userId) {
+		List<Transaction> transactions = transactionService.getTransaction(userId);
 		return transactions;
 	}
 
 	@Override
 	public int getCreditScore(long custId) {
-		int score = rest.getForObject("http://CREDITSCORE/getCreditScore"+custId, Integer.class);
+		int score = rest.getForObject("http://CREDITSCORE/score/latest/"+custId, Integer.class);
 		return score;
 	}
 
 	@Override
 	public int getNoOfRewards(long custId) {
-		int noOfRewards = rest.getForObject("http://REWARDS/getNoOfRewards"+custId, Integer.class);
+		int noOfRewards = rest.getForObject("http://REWARDSAPPLICATION/rewards/getAllRewards/"+custId, Integer.class);
 		return noOfRewards;
 	}
 
+	
 }
